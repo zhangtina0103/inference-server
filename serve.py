@@ -17,6 +17,7 @@ llm = LLM(
     max_lora_rank=32,
     dtype="float16",
     gpu_memory_utilization=0.9,
+    max_num_batched_tokens=65528,
 )
 
 
