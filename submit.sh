@@ -8,10 +8,14 @@
 #SBATCH --time=02:00:00
 #SBATCH --partition=mit_normal_gpu
 
-module load cuda/12.4.0
-conda activate inference
+# use full python path instead of conda activate
+export PATH="/orcd/home/002/zhangtin/miniforge3/envs/inference/bin:$PATH"
+export LD_LIBRARY_PATH="/orcd/home/002/zhangtin/miniforge3/envs/inference/lib:$LD_LIBRARY_PATH"
 
 mkdir -p logs
+
+# fix transformers version
+pip install transformers==4.44.0 -q
 
 echo "========================================"
 echo "starting vLLM server"
