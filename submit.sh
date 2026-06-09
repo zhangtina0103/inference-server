@@ -24,8 +24,8 @@ uvicorn serve:app --host 0.0.0.0 --port 8000 &
 SERVER_PID=$!
 echo "server PID: $SERVER_PID"
 
-echo "waiting for model to load (90s)..."
-sleep 90
+echo "waiting for model to load (120s)..."
+sleep 120
 
 echo "checking health..."
 curl -s http://localhost:8000/health
