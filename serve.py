@@ -18,8 +18,8 @@ llm = LLM(
     dtype="float16",
     gpu_memory_utilization=0.9,
     max_num_batched_tokens=65528,
+    max_model_len=65528,
 )
-
 
 class GenerateRequest(BaseModel):
     prompt: str
