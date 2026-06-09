@@ -3,17 +3,22 @@ import torch
 from fastapi import FastAPI
 from pydantic import BaseModel
 from vllm import LLM, SamplingParams
+from vllm.lora.request import LoRARequest
 from monitor import metrics
 
 app = FastAPI()
 
-# load model
+BASE_MODEL = "/orcd/home/002/zhangtin/models/llama_base"
+LORA_PATH  = "/orcd/home/002/zhangtin/models/llama_dpo/llama_lr1e5_b001_nosys"
+
 llm = LLM(
-    model="zhangtin/dpo-runs",
-    revision="llama_lr1e5_b001_nosys",
+    model=BASE_MODEL,
+    enable_lora=True,
+    max_lora_rank=32,
     dtype="float16",
     gpu_memory_utilization=0.9,
 )
+
 
 class GenerateRequest(BaseModel):
     prompt: str
@@ -41,15 +46,18 @@ def generate(request: GenerateRequest):
     )
 
     start = time.time()
-    outputs = llm.generate([request.prompt], sampling_params)
+    outputs = llm.generate(
+        [request.prompt],
+        sampling_params,
+        lora_request=LoRARequest("dpo_adapter", 1, LORA_PATH)
+    )
     latency_ms = (time.time() - start) * 1000
 
-    result = outputs[0]
-    text   = result.outputs[0].text
+    result            = outputs[0]
+    text              = result.outputs[0].text
     prompt_tokens     = len(result.prompt_token_ids)
     completion_tokens = len(result.outputs[0].token_ids)
 
-    # update prometheus metrics
     metrics.request_count.inc()
     metrics.latency.observe(latency_ms)
     metrics.prompt_tokens.inc(prompt_tokens)
