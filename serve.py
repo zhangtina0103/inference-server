@@ -39,37 +39,76 @@ def health():
     return {"status": "ok"}
 
 
+# @app.post("/generate", response_model=GenerateResponse)
+# def generate(request: GenerateRequest):
+#     sampling_params = SamplingParams(
+#         temperature=request.temperature,
+#         max_tokens=request.max_tokens,
+#     )
+
+#     start = time.time()
+#     outputs = llm.generate(
+#         [request.prompt],
+#         sampling_params,
+#         lora_request=LoRARequest("dpo_adapter", 1, LORA_PATH)
+#     )
+#     latency_ms = (time.time() - start) * 1000
+
+#     result            = outputs[0]
+#     text              = result.outputs[0].text
+#     prompt_tokens     = len(result.prompt_token_ids)
+#     completion_tokens = len(result.outputs[0].token_ids)
+
+#     metrics.request_count.inc()
+#     metrics.latency.observe(latency_ms)
+#     metrics.prompt_tokens.inc(prompt_tokens)
+#     metrics.completion_tokens.inc(completion_tokens)
+
+#     return GenerateResponse(
+#         text=text,
+#         prompt_tokens=prompt_tokens,
+#         completion_tokens=completion_tokens,
+#         latency_ms=latency_ms,
+#     )
+
+import traceback
+
 @app.post("/generate", response_model=GenerateResponse)
 def generate(request: GenerateRequest):
-    sampling_params = SamplingParams(
-        temperature=request.temperature,
-        max_tokens=request.max_tokens,
-    )
+    try:
+        sampling_params = SamplingParams(
+            temperature=request.temperature,
+            max_tokens=request.max_tokens,
+        )
 
-    start = time.time()
-    outputs = llm.generate(
-        [request.prompt],
-        sampling_params,
-        lora_request=LoRARequest("dpo_adapter", 1, LORA_PATH)
-    )
-    latency_ms = (time.time() - start) * 1000
+        start = time.time()
+        outputs = llm.generate(
+            [request.prompt],
+            sampling_params,
+            lora_request=LoRARequest("dpo_adapter", 1, LORA_PATH)
+        )
+        latency_ms = (time.time() - start) * 1000
 
-    result            = outputs[0]
-    text              = result.outputs[0].text
-    prompt_tokens     = len(result.prompt_token_ids)
-    completion_tokens = len(result.outputs[0].token_ids)
+        result            = outputs[0]
+        text              = result.outputs[0].text
+        prompt_tokens     = len(result.prompt_token_ids)
+        completion_tokens = len(result.outputs[0].token_ids)
 
-    metrics.request_count.inc()
-    metrics.latency.observe(latency_ms)
-    metrics.prompt_tokens.inc(prompt_tokens)
-    metrics.completion_tokens.inc(completion_tokens)
+        metrics.request_count.inc()
+        metrics.latency.observe(latency_ms)
+        metrics.prompt_tokens.inc(prompt_tokens)
+        metrics.completion_tokens.inc(completion_tokens)
 
-    return GenerateResponse(
-        text=text,
-        prompt_tokens=prompt_tokens,
-        completion_tokens=completion_tokens,
-        latency_ms=latency_ms,
-    )
+        return GenerateResponse(
+            text=text,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            latency_ms=latency_ms,
+        )
+    except Exception as e:
+        print(f"ERROR in generate: {e}")
+        traceback.print_exc()
+        raise
 
 
 @app.get("/metrics")
