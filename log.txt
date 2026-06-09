@@ -1,0 +1,63 @@
+========================================
+starting vLLM server
+========================================
+server PID: 3448177
+waiting for model to load (120s)...
+WARNING 06-09 01:27:46 config.py:1454] Casting torch.bfloat16 to torch.float16.
+WARNING 06-09 01:27:46 arg_utils.py:776] The model has a long context length (65528). This may cause OOM errors during the initial memory profiling phase, or result in low performance due to small KV cache space. Consider setting --max-model-len to a smaller value.
+INFO 06-09 01:27:46 llm_engine.py:174] Initializing an LLM engine (v0.5.4) with config: model='/orcd/home/002/zhangtin/models/llama_base', speculative_config=None, tokenizer='/orcd/home/002/zhangtin/models/llama_base', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, rope_scaling=None, rope_theta=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.float16, max_seq_len=65528, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto, quantization_param_path=None, device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='outlines'), observability_config=ObservabilityConfig(otlp_traces_endpoint=None), seed=0, served_model_name=/orcd/home/002/zhangtin/models/llama_base, use_v2_block_manager=False, enable_prefix_caching=False)
+INFO 06-09 01:27:46 model_runner.py:720] Starting to load model /orcd/home/002/zhangtin/models/llama_base...
+INFO 06-09 01:28:09 model_runner.py:732] Loading model weights took 14.9927 GB
+INFO 06-09 01:28:18 gpu_executor.py:102] # GPU blocks: 8530, # CPU blocks: 2048
+INFO 06-09 01:28:19 model_runner.py:1024] Capturing the model for CUDA graphs. This may lead to unexpected consequences if the model is not static. To run the model in eager mode, set 'enforce_eager=True' or use '--enforce-eager' in the CLI.
+INFO 06-09 01:28:19 model_runner.py:1028] CUDA graphs can take additional 1~3 GiB memory per GPU. If you are running out of memory, consider decreasing `gpu_memory_utilization` or enforcing eager mode. You can also reduce the `max_num_seqs` as needed to decrease memory usage.
+INFO 06-09 01:28:31 model_runner.py:1225] Graph capturing finished in 12 secs.
+checking health...
+{"status":"ok"}
+========================================
+running benchmark
+========================================
+WARNING 06-09 01:29:33 tokenizer.py:144] No tokenizer found in /orcd/home/002/zhangtin/models/llama_dpo/llama_lr1e5_b001_nosys, using base model tokenizer instead. (Exception: /orcd/home/002/zhangtin/models/llama_dpo/llama_lr1e5_b001_nosys does not appear to have a file named config.json. Checkout 'https://huggingface.co//orcd/home/002/zhangtin/models/llama_dpo/llama_lr1e5_b001_nosys/tree/None' for available files.)
+waiting for server to be ready...
+server health: {'status': 'ok'}
+benchmarking 4 prompts x 5 runs
+------------------------------------------------------------
+prompt 1 run 1 | latency: 8477.0ms | tokens: 256 | throughput: 30.2 tok/s
+prompt 1 run 2 | latency: 6043.3ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 1 run 3 | latency: 6042.5ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 1 run 4 | latency: 6041.4ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 1 run 5 | latency: 4784.8ms | tokens: 203 | throughput: 42.4 tok/s
+prompt 2 run 1 | latency: 6035.8ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 2 run 2 | latency: 6035.2ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 2 run 3 | latency: 6035.5ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 2 run 4 | latency: 6033.8ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 2 run 5 | latency: 6036.8ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 3 run 1 | latency: 6034.5ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 3 run 2 | latency: 6034.0ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 3 run 3 | latency: 3745.9ms | tokens: 159 | throughput: 42.4 tok/s
+prompt 3 run 4 | latency: 6032.3ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 3 run 5 | latency: 6034.6ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 4 run 1 | latency: 6033.6ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 4 run 2 | latency: 6033.8ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 4 run 3 | latency: 6035.1ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 4 run 4 | latency: 6034.6ms | tokens: 256 | throughput: 42.4 tok/s
+prompt 4 run 5 | latency: 6035.1ms | tokens: 256 | throughput: 42.4 tok/s
+
+============================================================
+BENCHMARK RESULTS
+============================================================
+avg latency:    5981.0ms
+p50 latency:    6034.9ms
+p95 latency:    8477.0ms
+avg throughput: 41.8 tok/s
+
+========================================
+KV cache demo
+========================================
+PagedKVCache(blocks=128, free=128, utilization=0.0%)
+request 0: torch.Size([20, 8, 64]) keys cached
+request 1: torch.Size([20, 8, 64]) keys cached
+request 2: torch.Size([20, 8, 64]) keys cached
+after 3 requests: PagedKVCache(blocks=128, free=122, utilization=4.7%)
+after freeing: PagedKVCache(blocks=128, free=128, utilization=0.0%)
+done. killing server...
